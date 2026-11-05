@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <title>英文閱讀筆記</title>
+  <style>
+    :root {
+      --paper: #f6f8f4;
+      --ink: #1d2b4f;
+      --ink-soft: #55617c;
+      --rule: #bcc9dc;
+      --marker: #f8e85a;
+      --marker-ink: #1d2b4f;
+      --red-pen: #bb2d24;
+      --save: #1d2b4f;
+      --save-text: #ffffff;
+      --sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      --serif: Georgia, "Times New Roman", "Songti TC", "Noto Serif TC", "PMingLiU", serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #151c30;
+        --ink: #eef1f6;
+        --ink-soft: #aab4c8;
+        --rule: #46526e;
+        --red-pen: #ff9c92;
+        --save: #f8e85a;
+        --save-text: #1d2b4f;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 28px 16px 56px;
+    }
+
+    h1 {
+      margin: 0 0 24px;
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      line-height: 1.3;
+    }
+
+    .field { margin-bottom: 22px; }
+
+    label, .field-label {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+    }
+
+    .required { color: var(--red-pen); }
+
+    input[type="text"], textarea, select {
+      display: block;
+      width: 100%;
+      padding: 8px 2px;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      border-radius: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    select option { color: #1d2b4f; }
+
+    input[type="text"]:focus, textarea:focus, select:focus {
+      border-bottom-color: var(--ink);
+      box-shadow: 0 1px 0 var(--ink);
+    }
+
+    button { font: inherit; cursor: pointer; }
+
+    button:focus-visible, input[type="radio"]:focus-visible + span {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    .primary {
+      min-height: 46px;
+      padding: 8px 20px;
+      border: 0;
+      border-radius: 3px;
+      background: var(--save);
+      color: var(--save-text);
+      font-weight: 700;
+    }
+
+    .primary:disabled, .quiet:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .quiet {
+      min-height: 40px;
+      padding: 6px 12px;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .source-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 26px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .source-bar strong {
+      min-width: 0;
+      font-family: var(--serif);
+      font-size: 1.0625rem;
+      font-weight: 400;
+      overflow-wrap: anywhere;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 26px;
+    }
+
+    .tab {
+      min-height: 44px;
+      padding: 6px 12px;
+      border: 0;
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 1.0625rem;
+    }
+
+    /* 分頁選取狀態：像在書上畫下一道螢光筆 */
+    .tab[aria-selected="true"] {
+      color: var(--marker-ink);
+      font-weight: 700;
+      background: linear-gradient(176deg, transparent 13%, var(--marker) 15%, var(--marker) 86%, transparent 88%);
+    }
+
+    .headword input {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      line-height: 1.3;
+    }
+
+    .type-setting {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: -10px 0 20px;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+    }
+
+    .type-setting label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 0;
+      min-height: 32px;
+      color: var(--ink);
+      font-size: 0.9375rem;
+      cursor: pointer;
+    }
+
+    .status {
+      min-height: 1.6em;
+      margin-top: 10px;
+      font-size: 0.9375rem;
+      overflow-wrap: anywhere;
+    }
+
+    .status.error { color: var(--red-pen); }
+
+    #result {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 2px solid var(--ink);
+      outline: none;
+      scroll-margin-top: 12px;
+    }
+
+    .result-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .result-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 12px;
+      min-width: 0;
+    }
+
+    #result h2 {
+      margin: 0;
+      min-width: 0;
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      font-weight: 400;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .phonetic, .source-tag {
+      color: var(--ink-soft);
+    }
+
+    .source-tag {
+      flex: none;
+      font-size: 0.875rem;
+    }
+
+    .short-meaning {
+      margin: 4px 0 18px;
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+
+    .short-meaning:empty { margin-bottom: 8px; }
+
+    .duplicate {
+      margin-bottom: 20px;
+      padding: 10px 12px;
+      border-left: 4px solid var(--marker);
+    }
+
+    .duplicate p { margin: 0 0 8px; }
+
+    .no-result { margin: 0 0 18px; }
+
+    .meanings { margin-bottom: 22px; }
+
+    .line-part {
+      margin-top: 16px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .line-part:first-child { margin-top: 0; }
+
+    .line-definition {
+      margin-top: 8px;
+      padding-left: 1.4em;
+      text-indent: -1.4em;
+      font-weight: 500;
+    }
+
+    .line-english {
+      padding-left: 1.4em;
+      color: var(--ink-soft);
+    }
+
+    .line-example {
+      padding-left: 1.4em;
+      font-family: var(--serif);
+    }
+
+    .context {
+      margin-bottom: 20px;
+      padding-left: 12px;
+      border-left: 4px solid var(--marker);
+    }
+
+    .context h3 {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+      font-weight: 400;
+    }
+
+    .context p { margin: 2px 0 0; }
+
+    .ai-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+    }
+
+    .ai-row .quiet { font-size: 1rem; }
+
+    #result-context, #detail-ai, #detail-understanding, #detail-question, #detail-sentence {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    main.wide { max-width: 1120px; }
+
+    #detail-title {
+      margin: 0;
+      min-width: 0;
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      font-weight: 400;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .page-nav .tab { flex: none; padding: 6px 14px; }
+
+    .page-nav {
+      display: flex;
+      gap: 8px;
+      margin: -8px 0 24px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    input[type="search"] {
+      display: block;
+      width: 100%;
+      padding: 8px 2px;
+      border: 0;
+      border-bottom: 1px solid var(--ink);
+      border-radius: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+      outline: none;
+      appearance: none;
+    }
+
+    input[type="search"]:focus { box-shadow: 0 1px 0 var(--ink); }
+
+    .search-field { margin-bottom: 14px; }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+    }
+
+    .filter-row label { margin: 0; font-size: inherit; }
+    .filter-row select { width: auto; min-width: 170px; max-width: 100%; padding: 4px 2px; }
+
+    .pick {
+      min-height: 36px;
+      padding: 4px 11px;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .pick[aria-pressed="true"] {
+      border-color: var(--save);
+      background: var(--save);
+      color: var(--save-text);
+    }
+
+    .record-count {
+      margin: 14px 0 6px;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+    }
+
+    .letter-jump {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .letter-jump button {
+      min-width: 32px;
+      min-height: 32px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--serif);
+    }
+
+    .book-group {
+      margin: 18px 0 4px;
+      font-family: var(--serif);
+      font-size: 1.0625rem;
+      font-weight: 700;
+    }
+
+    .article-toggle {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      min-height: 36px;
+      margin-top: 8px;
+      padding: 4px 0;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+      text-align: left;
+    }
+
+    .article-count { flex: none; }
+
+    .letter-group {
+      margin-top: 16px;
+      border-bottom: 1px solid var(--rule);
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      scroll-margin-top: 8px;
+    }
+
+    .record-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      padding: 9px 0;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .record-item.selected {
+      width: calc(100% + 16px);
+      margin: 0 -8px;
+      padding-left: 8px;
+      padding-right: 8px;
+      background: var(--marker);
+      color: var(--marker-ink);
+    }
+
+    .record-item.selected .record-sub, .record-item.selected .record-tag { color: var(--marker-ink); }
+
+    .record-main { min-width: 0; overflow-wrap: anywhere; }
+
+    .record-name {
+      display: block;
+      font-family: var(--serif);
+      font-size: 1.125rem;
+    }
+
+    .record-sub {
+      display: block;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+    }
+
+    .record-tag {
+      flex: none;
+      max-width: 40%;
+      color: var(--ink-soft);
+      font-size: 0.8125rem;
+      overflow-wrap: anywhere;
+    }
+
+    .records-empty { margin: 18px 0; }
+
+    .back {
+      display: none;
+      min-height: 40px;
+      margin-bottom: 12px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .detail-source { display: block; margin: -14px 0 18px; }
+
+    .detail-block { margin-bottom: 20px; }
+
+    .detail-block h3 {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+      font-weight: 400;
+    }
+
+    .detail-block p { margin: 2px 0 0; }
+
+    .english-text { font-family: var(--serif); }
+
+    @media (min-width: 861px) {
+      .records-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      #record-detail {
+        position: sticky;
+        top: 16px;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+        padding-left: 32px;
+        border-left: 2px solid var(--ink);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .records-layout #record-detail { display: none; }
+      .records-layout.showing-detail #record-detail { display: block; }
+      .records-layout.showing-detail #records-list { display: none; }
+      .back { display: block; }
+      .detail-empty { display: none; }
+    }
+
+    @media (max-width: 520px) {
+      main { padding-top: 20px; }
+      .tab { flex: 1; padding: 6px 4px; }
+      #setup .primary, #setup .quiet { flex: 1; }
+      .primary-wide { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main id="main">
+    <h1>英文閱讀筆記</h1>
+
+    <nav class="page-nav" aria-label="切換頁面">
+      <button class="tab" type="button" id="nav-add" aria-selected="true">新增</button>
+      <button class="tab" type="button" id="nav-records" aria-selected="false">紀錄</button>
+    </nav>
+
+    <div id="add-page">
+    <section id="setup" aria-label="設定閱讀篇章" hidden>
+      <div class="field">
+        <label for="book">書名 <span class="required">*</span></label>
+        <input type="text" id="book" list="book-options" autocomplete="off">
+        <datalist id="book-options"></datalist>
+      </div>
+      <div class="field">
+        <label for="article">篇名 <span class="required">*</span></label>
+        <input type="text" id="article" list="article-options" autocomplete="off">
+        <datalist id="article-options"></datalist>
+      </div>
+      <div class="button-row">
+        <button class="primary" id="start" type="button">開始記錄</button>
+        <button class="quiet" id="cancel-change" type="button" hidden>取消</button>
+      </div>
+      <div class="status" id="setup-status" role="status" aria-live="polite"></div>
+    </section>
+
+    <div id="workspace" hidden>
+      <div class="source-bar">
+        <strong id="current-source"></strong>
+        <button class="quiet" id="change-source" type="button">更換</button>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="筆記類型">
+        <button class="tab" type="button" role="tab" id="tab-lookup" aria-controls="panel-lookup" aria-selected="true">單字／片語</button>
+        <button class="tab" type="button" role="tab" id="tab-reading" aria-controls="panel-reading" aria-selected="false">閱讀理解</button>
+      </div>
+
+      <section id="panel-lookup" role="tabpanel" aria-labelledby="tab-lookup">
+        <div class="field headword">
+          <label for="lookup-text">單字或片語 <span class="required">*</span></label>
+          <input type="text" id="lookup-text" autocapitalize="none" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="type-setting">
+          <span>類型</span>
+          <label><input type="radio" name="record-type" value="單字" checked><span>單字</span></label>
+          <label><input type="radio" name="record-type" value="片語"><span>片語</span></label>
+        </div>
+
+        <div class="field">
+          <label for="lookup-sentence">原文句子（選填）</label>
+          <textarea id="lookup-sentence"></textarea>
+        </div>
+
+        <button class="primary primary-wide" id="lookup" type="button">查詢並儲存</button>
+        <div class="status" id="lookup-status" role="status" aria-live="polite"></div>
+
+        <article id="result" aria-label="查詢結果" tabindex="-1" hidden>
+          <div class="result-head">
+            <div class="result-title">
+              <h2 id="result-text"></h2>
+              <span class="phonetic" id="result-phonetic"></span>
+            </div>
+            <span class="source-tag" id="result-source"></span>
+          </div>
+          <p class="short-meaning" id="result-short"></p>
+
+          <div class="duplicate" id="duplicate" hidden>
+            <p id="duplicate-text"></p>
+            <button class="quiet" id="save-another" type="button">另存到目前篇章</button>
+          </div>
+
+          <p class="no-result" id="no-result" hidden></p>
+          <div class="meanings" id="result-meanings"></div>
+
+          <div class="context" id="context" hidden>
+            <h3>AI 解析</h3>
+            <p id="result-context"></p>
+          </div>
+
+          <div class="ai-row">
+            <button class="quiet" id="analyze" type="button">AI 解析</button>
+            <span id="ai-usage"></span>
+          </div>
+
+          <div class="field">
+            <label for="result-note">我的註解</label>
+            <textarea id="result-note"></textarea>
+          </div>
+          <div class="status" id="result-status" role="status" aria-live="polite"></div>
+        </article>
+      </section>
+
+      <section id="panel-reading" role="tabpanel" aria-labelledby="tab-reading" hidden>
+        <div class="field">
+          <label for="reading-topic">段落或主題（選填）</label>
+          <input type="text" id="reading-topic" data-reading="段落或主題" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="reading-understanding">我的理解 <span class="required">*</span></label>
+          <textarea id="reading-understanding" data-reading="我的理解" rows="5"></textarea>
+        </div>
+        <div class="field">
+          <label for="reading-sentence">原文句子（選填）</label>
+          <textarea id="reading-sentence" data-reading="原文句子"></textarea>
+        </div>
+        <div class="field">
+          <label for="reading-question">疑問（選填）</label>
+          <textarea id="reading-question" data-reading="疑問"></textarea>
+        </div>
+        <button class="primary primary-wide" id="save-reading" type="button">儲存</button>
+        <div class="status" id="reading-status" role="status" aria-live="polite"></div>
+      </section>
+    </div>
+    </div>
+
+    <div id="records-page" hidden>
+      <div class="records-layout">
+        <section id="records-list" aria-label="紀錄列表">
+          <div class="field search-field">
+            <label for="record-search">搜尋</label>
+            <input type="search" id="record-search" placeholder="搜尋單字、片語或筆記" autocomplete="off">
+          </div>
+
+          <div class="filter-row" role="group" aria-label="排序">
+            <span>排序</span>
+            <button class="pick" type="button" data-sort="篇章" aria-pressed="true">閱讀篇章</button>
+            <button class="pick" type="button" data-sort="字母" aria-pressed="false">首字母</button>
+            <button class="pick" type="button" data-sort="最新" aria-pressed="false">最新</button>
+          </div>
+
+          <div class="filter-row" role="group" aria-label="類型">
+            <span>類型</span>
+            <button class="pick" type="button" data-filter-type="全部" aria-pressed="true">全部</button>
+            <button class="pick" type="button" data-filter-type="單字" aria-pressed="false">單字</button>
+            <button class="pick" type="button" data-filter-type="片語" aria-pressed="false">片語</button>
+            <button class="pick" type="button" data-filter-type="閱讀理解" aria-pressed="false">閱讀理解</button>
+          </div>
+
+          <div class="filter-row">
+            <label for="book-filter">書名</label>
+            <select id="book-filter"></select>
+          </div>
+
+          <div class="record-count" id="record-count" role="status" aria-live="polite"></div>
+          <div class="letter-jump" id="letter-jump" hidden></div>
+          <div id="record-items"></div>
+        </section>
+
+        <section id="record-detail" aria-label="紀錄內容">
+          <button class="back" id="back-to-list" type="button">‹ 返回紀錄</button>
+          <p class="detail-empty" id="detail-empty">選擇一筆紀錄查看內容。</p>
+
+          <article id="detail-body" hidden>
+            <div class="result-title">
+              <h2 id="detail-title"></h2>
+              <span class="phonetic" id="detail-phonetic"></span>
+            </div>
+            <p class="short-meaning" id="detail-short"></p>
+            <p class="source-tag detail-source" id="detail-source"></p>
+
+            <div class="meanings" id="detail-meanings"></div>
+
+            <div class="detail-block" id="detail-sentence-block" hidden>
+              <h3>原文句子</h3>
+              <p class="english-text" id="detail-sentence"></p>
+            </div>
+
+            <div class="context" id="detail-ai-block" hidden>
+              <h3>AI 解析</h3>
+              <p id="detail-ai"></p>
+            </div>
+
+            <div class="detail-block" id="detail-understanding-block" hidden>
+              <h3>我的理解</h3>
+              <p id="detail-understanding"></p>
+            </div>
+
+            <div class="detail-block" id="detail-question-block" hidden>
+              <h3>疑問</h3>
+              <p id="detail-question"></p>
+            </div>
+
+            <div class="field" id="detail-note-field">
+              <label for="detail-note">我的註解</label>
+              <textarea id="detail-note"></textarea>
+            </div>
+            <div class="status" id="detail-status" role="status" aria-live="polite"></div>
+          </article>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    var currentBook = '';
+    var currentArticle = '';
+    var articlesByBook = {};
+    var aiReady = false;
+    var currentRecord = null;
+    var duplicateRequest = null;
+    var typeChosenByHand = false;
+    var queriedSentence = '';
+
+    var lookupId = '';
+    var lookupContent = '';
+    var readingId = '';
+    var readingContent = '';
+
+    var allRecords = [];
+    var recordsStale = true;
+    var recordsLoading = false;
+    var selectedRecordId = '';
+    var sortMode = '篇章';
+    var typeFilter = '全部';
+    var closedArticles = {};
+    var listScroll = 0;
+
+    var page = {};
+    ['setup', 'workspace', 'book', 'article', 'book-options', 'article-options', 'start', 'cancel-change', 'setup-status',
+     'current-source', 'change-source', 'tab-lookup', 'tab-reading', 'panel-lookup', 'panel-reading',
+     'lookup-text', 'lookup-sentence', 'lookup', 'lookup-status', 'ai-usage', 'result', 'result-text', 'result-phonetic',
+     'result-source', 'result-short', 'duplicate', 'duplicate-text', 'save-another', 'no-result', 'result-meanings',
+     'context', 'result-context', 'result-note', 'result-status', 'analyze',
+     'save-reading', 'reading-status', 'reading-understanding',
+     'main', 'nav-add', 'nav-records', 'add-page', 'records-page', 'record-search', 'book-filter', 'record-count',
+     'letter-jump', 'record-items', 'back-to-list', 'detail-empty', 'detail-body', 'detail-title', 'detail-phonetic',
+     'detail-short', 'detail-source', 'detail-meanings', 'detail-sentence-block', 'detail-sentence', 'detail-ai-block',
+     'detail-ai', 'detail-understanding-block', 'detail-understanding', 'detail-question-block', 'detail-question',
+     'detail-note-field', 'detail-note', 'detail-status'].forEach(function (id) {
+      page[id] = document.getElementById(id);
+    });
+
+    function showStatus(box, message, isError) {
+      box.textContent = message;
+      box.className = isError ? 'status error' : 'status';
+    }
+
+    function newId() {
+      return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    }
+
+    function errorText(error, fallback) {
+      var message = (error && error.message ? error.message : '').replace(/^Error:\s*/, '');
+      return message.indexOf('請') === 0 ? message : fallback;
+    }
+
+    function fillOptions(listElement, items) {
+      listElement.innerHTML = '';
+      items.forEach(function (item) {
+        var option = document.createElement('option');
+        option.value = item;
+        listElement.appendChild(option);
+      });
+    }
+
+    function refreshOptions() {
+      fillOptions(page['book-options'], Object.keys(articlesByBook));
+      fillOptions(page['article-options'], articlesByBook[page.book.value.trim()] || []);
+    }
+
+    function rememberSource() {
+      if (!articlesByBook[currentBook]) {
+        articlesByBook[currentBook] = [];
+      }
+      if (articlesByBook[currentBook].indexOf(currentArticle) === -1) {
+        articlesByBook[currentBook].push(currentArticle);
+      }
+    }
+
+    function showWorkspace() {
+      page['current-source'].textContent = currentBook + '／' + currentArticle;
+      page.setup.hidden = true;
+      page.workspace.hidden = false;
+      page['lookup-text'].focus();
+    }
+
+    function showSetup() {
+      page.book.value = currentBook;
+      page.article.value = currentArticle;
+      page['cancel-change'].hidden = !currentBook;
+      showStatus(page['setup-status'], '', false);
+      refreshOptions();
+      page.workspace.hidden = true;
+      page.setup.hidden = false;
+      page.book.focus();
+    }
+
+    function showUsage(usage) {
+      page['ai-usage'].textContent = aiReady && usage ? '今天 ' + usage.used + '/' + usage.limit + ' 次' : '';
+    }
+
+    function setType(type) {
+      document.querySelector('input[name="record-type"][value="' + type + '"]').checked = true;
+    }
+
+    function selectedType() {
+      return document.querySelector('input[name="record-type"]:checked').value;
+    }
+
+    function hideResult() {
+      currentRecord = null;
+      duplicateRequest = null;
+      page.result.hidden = true;
+    }
+
+    // 把解釋文字分成詞性、解釋、英文、例句，方便閱讀
+    function showMeanings(box, meaningText, exampleText) {
+      box.innerHTML = '';
+
+      var text = meaningText || '';
+      if (exampleText && text.indexOf('例句：') === -1) {
+        text = text + '\n\n例句\n' + exampleText;
+      }
+
+      text.split('\n').forEach(function (line) {
+        if (!line.trim()) {
+          return;
+        }
+
+        var row = document.createElement('div');
+        var content = line.trim();
+
+        if (content.indexOf('例句：') === 0) {
+          row.className = 'line-example';
+        } else if (line.indexOf('   ') === 0) {
+          row.className = 'line-english';
+        } else if (/^\d+\.\s/.test(content)) {
+          row.className = 'line-definition';
+        } else {
+          row.className = 'line-part';
+        }
+
+        row.textContent = content;
+        box.appendChild(row);
+      });
+    }
+
+    function showRecord(record) {
+      currentRecord = record;
+      page.result.hidden = false;
+      page['result-text'].textContent = record['內容'];
+      page['result-phonetic'].textContent = record['音標'] || '';
+      page['result-short'].textContent = record['簡短釋義'] || '';
+
+      var source = record['來源'] === '需手動補充' ? '查無結果' : (record['來源'] || '手動');
+      page['result-source'].textContent = '已儲存，來源：' + source;
+
+      showMeanings(page['result-meanings'], record['解釋'], record['例句']);
+
+      var aiText = record['AI解析'] || record['這篇文章中的意思'] || '';
+      page['no-result'].hidden = Boolean(record['解釋']);
+      page['no-result'].textContent = aiText ? '字典查不到這個內容。' : '字典查不到這個內容，可以按「AI 解析」查詢。';
+      page['result-context'].textContent = aiText;
+      page.context.hidden = !aiText;
+      page['result-note'].value = record['我的註解'] || '';
+      showStatus(page['result-status'], '', false);
+    }
+
+    function lookupFinished(response) {
+      recordsStale = true;
+      page.lookup.disabled = false;
+      page.lookup.textContent = '查詢並儲存';
+      page['save-another'].disabled = false;
+
+      showRecord(response.record);
+      showStatus(page['lookup-status'], '', false);
+
+      if (response.duplicate) {
+        duplicateRequest = {
+          text: page['lookup-text'].value.trim(),
+          sentence: page['lookup-sentence'].value.trim()
+        };
+        page.duplicate.hidden = false;
+        page['duplicate-text'].textContent = '這個字已在「' + response.record['書名'] + '／' + response.record['篇名'] + '」記錄過，下面是當時的筆記。';
+      } else {
+        duplicateRequest = null;
+        page.duplicate.hidden = true;
+      }
+
+      lookupId = '';
+      lookupContent = '';
+      queriedSentence = page['lookup-sentence'].value;
+      page['lookup-text'].value = '';
+      typeChosenByHand = false;
+
+      page.result.focus({ preventScroll: true });
+      page.result.scrollIntoView({ block: 'start' });
+    }
+
+    function runLookup(text, sentence, type, saveAnother) {
+      var content = JSON.stringify([text, sentence, type, currentBook, currentArticle, saveAnother]);
+      if (content !== lookupContent) {
+        lookupContent = content;
+        lookupId = newId();
+      }
+
+      page.lookup.disabled = true;
+      page['save-another'].disabled = true;
+      page.lookup.textContent = '查詢中…';
+      showStatus(page['lookup-status'], '', false);
+
+      google.script.run
+        .withSuccessHandler(lookupFinished)
+        .withFailureHandler(function (error) {
+          page.lookup.disabled = false;
+          page['save-another'].disabled = false;
+          page.lookup.textContent = '查詢並儲存';
+          showStatus(page['lookup-status'], errorText(error, '沒有完成，內容還在畫面上。請確認網路後再按一次「查詢並儲存」。'), true);
+        })
+        .saveAndLookup({
+          id: lookupId,
+          text: text,
+          sentence: sentence,
+          type: type,
+          book: currentBook,
+          article: currentArticle,
+          saveAnother: saveAnother
+        });
+    }
+
+    // 設定書名與篇名
+    page.book.addEventListener('input', refreshOptions);
+
+    page.start.addEventListener('click', function () {
+      var book = page.book.value.trim();
+      var article = page.article.value.trim();
+
+      if (!book) {
+        showStatus(page['setup-status'], '請填寫「書名」。', true);
+        page.book.focus();
+        return;
+      }
+      if (!article) {
+        showStatus(page['setup-status'], '請填寫「篇名」。', true);
+        page.article.focus();
+        return;
+      }
+
+      currentBook = book;
+      currentArticle = article;
+      rememberSource();
+      showWorkspace();
+
+      google.script.run
+        .withFailureHandler(function () {
+          showStatus(page['lookup-status'], '書名和篇名沒有同步到其他裝置，紀錄仍會用目前畫面上的名稱儲存。', true);
+        })
+        .saveSource({ book: book, article: article });
+    });
+
+    page['cancel-change'].addEventListener('click', showWorkspace);
+    page['change-source'].addEventListener('click', showSetup);
+
+    // 切換分頁
+    page['tab-lookup'].addEventListener('click', function () {
+      page['tab-lookup'].setAttribute('aria-selected', 'true');
+      page['tab-reading'].setAttribute('aria-selected', 'false');
+      page['panel-lookup'].hidden = false;
+      page['panel-reading'].hidden = true;
+    });
+
+    page['tab-reading'].addEventListener('click', function () {
+      page['tab-reading'].setAttribute('aria-selected', 'true');
+      page['tab-lookup'].setAttribute('aria-selected', 'false');
+      page['panel-reading'].hidden = false;
+      page['panel-lookup'].hidden = true;
+    });
+
+    // 輸入時自動判斷類型；開始查下一個字時，收起上一筆結果和舊句子
+    page['lookup-text'].addEventListener('input', function () {
+      var text = page['lookup-text'].value.trim();
+
+      if (!typeChosenByHand) {
+        setType(/\s/.test(text) ? '片語' : '單字');
+      }
+
+      if (text && currentRecord) {
+        if (page['lookup-sentence'].value === queriedSentence) {
+          page['lookup-sentence'].value = '';
+        }
+        queriedSentence = '';
+        hideResult();
+      }
+    });
+
+    document.querySelectorAll('input[name="record-type"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        typeChosenByHand = true;
+      });
+    });
+
+    // 查詢並儲存
+    page.lookup.addEventListener('click', function () {
+      var text = page['lookup-text'].value.trim();
+      if (!text) {
+        showStatus(page['lookup-status'], '請填寫「單字或片語」。', true);
+        page['lookup-text'].focus();
+        return;
+      }
+      runLookup(text, page['lookup-sentence'].value.trim(), selectedType(), false);
+    });
+
+    page['lookup-text'].addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        page.lookup.click();
+      }
+    });
+
+    page['save-another'].addEventListener('click', function () {
+      if (duplicateRequest) {
+        runLookup(duplicateRequest.text, duplicateRequest.sentence, '', true);
+      }
+    });
+
+    // 我的註解：離開欄位時自動儲存
+    page['result-note'].addEventListener('change', function () {
+      if (!currentRecord) {
+        return;
+      }
+
+      var id = currentRecord['ID'];
+      var note = page['result-note'].value;
+      var statusBox = page['result-status'];
+
+      currentRecord['我的註解'] = note;
+      recordsStale = true;
+      showStatus(statusBox, '儲存中…', false);
+
+      google.script.run
+        .withSuccessHandler(function () {
+          if (currentRecord && currentRecord['ID'] === id) {
+            showStatus(statusBox, '已儲存註解', false);
+          }
+        })
+        .withFailureHandler(function (error) {
+          showStatus(page['lookup-status'], errorText(error, '註解沒有存成功，請確認網路後再改一次。'), true);
+        })
+        .saveNote({ id: id, note: note });
+    });
+
+    // AI 解析
+    page.analyze.addEventListener('click', function () {
+      var id = currentRecord['ID'];
+
+      page.analyze.disabled = true;
+      page.analyze.textContent = '解析中…';
+      showStatus(page['result-status'], '', false);
+
+      google.script.run
+        .withSuccessHandler(function (response) {
+          page.analyze.disabled = false;
+          page.analyze.textContent = 'AI 解析';
+          showUsage(response.aiUsage);
+          recordsStale = true;
+
+          if (currentRecord && currentRecord['ID'] === id) {
+            var note = page['result-note'].value;
+            showRecord(response.record);
+            page['result-note'].value = note;
+
+            if (response.message) {
+              showStatus(page['result-status'], response.message, true);
+            } else if (response.reused) {
+              showStatus(page['result-status'], '這筆已解析過，沒有使用 AI 次數。', false);
+            }
+          }
+        })
+        .withFailureHandler(function (error) {
+          page.analyze.disabled = false;
+          page.analyze.textContent = 'AI 解析';
+          showStatus(page['result-status'], errorText(error, 'AI 解析沒有完成，請確認網路後再試一次。'), true);
+        })
+        .analyzeWithAi({ id: id, sentence: page['lookup-sentence'].value.trim() });
+    });
+
+    // 儲存閱讀理解
+    page['save-reading'].addEventListener('click', function () {
+      var fields = document.querySelectorAll('[data-reading]');
+      var values = {};
+
+      fields.forEach(function (field) {
+        values[field.dataset.reading] = field.value.trim();
+      });
+
+      if (!values['我的理解']) {
+        showStatus(page['reading-status'], '請填寫「我的理解」。', true);
+        page['reading-understanding'].focus();
+        return;
+      }
+
+      var content = JSON.stringify([values, currentBook, currentArticle]);
+      if (content !== readingContent) {
+        readingContent = content;
+        readingId = newId();
+      }
+
+      page['save-reading'].disabled = true;
+      page['save-reading'].textContent = '儲存中…';
+      showStatus(page['reading-status'], '', false);
+
+      google.script.run
+        .withSuccessHandler(function () {
+          recordsStale = true;
+          fields.forEach(function (field) {
+            field.value = '';
+          });
+          readingId = '';
+          readingContent = '';
+          page['save-reading'].disabled = false;
+          page['save-reading'].textContent = '儲存';
+          showStatus(page['reading-status'], '已儲存', false);
+          page['reading-understanding'].focus();
+        })
+        .withFailureHandler(function (error) {
+          page['save-reading'].disabled = false;
+          page['save-reading'].textContent = '儲存';
+          showStatus(page['reading-status'], errorText(error, '沒有存成功，內容還在畫面上。請確認網路後再按一次「儲存」。'), true);
+        })
+        .saveReading({ id: readingId, book: currentBook, article: currentArticle, values: values });
+    });
+
+    // ---------- 頁面切換 ----------
+
+    function openAddPage() {
+      page['nav-add'].setAttribute('aria-selected', 'true');
+      page['nav-records'].setAttribute('aria-selected', 'false');
+      page['add-page'].hidden = false;
+      page['records-page'].hidden = true;
+      page.main.className = '';
+    }
+
+    function openRecordsPage() {
+      page['nav-add'].setAttribute('aria-selected', 'false');
+      page['nav-records'].setAttribute('aria-selected', 'true');
+      page['add-page'].hidden = true;
+      page['records-page'].hidden = false;
+      page.main.className = 'wide';
+
+      if (recordsStale) {
+        loadRecords();
+      } else {
+        renderRecords();
+      }
+    }
+
+    page['nav-add'].addEventListener('click', openAddPage);
+    page['nav-records'].addEventListener('click', openRecordsPage);
+
+    // ---------- 紀錄頁 ----------
+
+    function loadRecords() {
+      if (recordsLoading) {
+        return;
+      }
+
+      recordsLoading = true;
+      page['record-count'].textContent = '載入中…';
+
+      google.script.run
+        .withSuccessHandler(function (records) {
+          recordsLoading = false;
+          recordsStale = false;
+          allRecords = records;
+
+          var bookNames = [];
+          allRecords.forEach(function (record) {
+            if (record['書名'] && bookNames.indexOf(record['書名']) === -1) {
+              bookNames.push(record['書名']);
+            }
+          });
+          bookNames.sort(function (a, b) {
+            return a.localeCompare(b, 'en', { sensitivity: 'base' });
+          });
+
+          var selectedBook = page['book-filter'].value;
+          page['book-filter'].innerHTML = '';
+          ['全部'].concat(bookNames).forEach(function (bookName) {
+            var option = document.createElement('option');
+            option.value = bookName;
+            option.textContent = bookName;
+            page['book-filter'].appendChild(option);
+          });
+          page['book-filter'].value = bookNames.indexOf(selectedBook) !== -1 ? selectedBook : '全部';
+
+          renderRecords();
+          if (selectedRecordId) {
+            var selected = findLoadedRecord(selectedRecordId);
+            if (selected) {
+              showDetail(selected, false);
+            }
+          }
+        })
+        .withFailureHandler(function () {
+          recordsLoading = false;
+          page['record-count'].textContent = '紀錄載入失敗，請確認網路後再按一次「紀錄」。';
+        })
+        .getRecords();
+    }
+
+    function findLoadedRecord(id) {
+      for (var i = 0; i < allRecords.length; i++) {
+        if (allRecords[i]['ID'] === id) {
+          return allRecords[i];
+        }
+      }
+      return null;
+    }
+
+    function recordName(record) {
+      if (record['類型'] !== '閱讀理解') {
+        return record['內容'];
+      }
+      return record['內容'] || '閱讀理解筆記';
+    }
+
+    function recordSummary(record) {
+      if (record['類型'] === '閱讀理解') {
+        return record['我的理解'].length > 40 ? record['我的理解'].slice(0, 40) + '…' : record['我的理解'];
+      }
+      return record['簡短釋義'] || '尚無釋義';
+    }
+
+    function firstLetter(record) {
+      var letter = record['內容'].trim().charAt(0).toUpperCase();
+      return /[A-Z]/.test(letter) ? letter : '#';
+    }
+
+    function addRecordItem(record, tagText) {
+      var item = document.createElement('button');
+      item.type = 'button';
+      item.className = record['ID'] === selectedRecordId ? 'record-item selected' : 'record-item';
+
+      var main = document.createElement('span');
+      main.className = 'record-main';
+      var name = document.createElement('span');
+      name.className = 'record-name';
+      name.textContent = recordName(record);
+      var summary = document.createElement('span');
+      summary.className = 'record-sub';
+      summary.textContent = recordSummary(record);
+      main.appendChild(name);
+      main.appendChild(summary);
+
+      var tag = document.createElement('span');
+      tag.className = 'record-tag';
+      tag.textContent = tagText;
+
+      item.appendChild(main);
+      item.appendChild(tag);
+      item.addEventListener('click', function () {
+        showDetail(record, true);
+      });
+
+      page['record-items'].appendChild(item);
+    }
+
+    function renderRecords() {
+      var box = page['record-items'];
+      var jump = page['letter-jump'];
+      var keyword = page['record-search'].value.trim().toLowerCase();
+      var book = page['book-filter'].value || '全部';
+
+      box.innerHTML = '';
+      jump.innerHTML = '';
+      jump.hidden = true;
+
+      document.querySelector('[data-filter-type="閱讀理解"]').hidden = sortMode === '字母';
+
+      var records = allRecords.filter(function (record) {
+        if (typeFilter !== '全部' && record['類型'] !== typeFilter) {
+          return false;
+        }
+        if (book !== '全部' && record['書名'] !== book) {
+          return false;
+        }
+        if (sortMode === '字母' && record['類型'] === '閱讀理解') {
+          return false;
+        }
+        if (!keyword) {
+          return true;
+        }
+        return Object.keys(record).some(function (key) {
+          return key !== 'ID' && String(record[key]).toLowerCase().indexOf(keyword) !== -1;
+        });
+      });
+
+      var note = sortMode === '字母' ? '，閱讀理解不列入 A–Z' : '';
+      page['record-count'].textContent = '共 ' + records.length + ' 筆' + note;
+
+      if (records.length === 0) {
+        var empty = document.createElement('p');
+        empty.className = 'records-empty';
+        empty.textContent = allRecords.length === 0
+          ? '還沒有紀錄。到「新增」記下第一個單字或片語。'
+          : '找不到符合的紀錄，請換個關鍵字或篩選條件。';
+        box.appendChild(empty);
+        return;
+      }
+
+      if (sortMode === '最新') {
+        records.sort(function (a, b) {
+          return b['新增時間'].localeCompare(a['新增時間']);
+        });
+        records.forEach(function (record) {
+          addRecordItem(record, record['篇名']);
+        });
+        return;
+      }
+
+      if (sortMode === '字母') {
+        records.sort(function (a, b) {
+          return a['內容'].localeCompare(b['內容'], 'en', { sensitivity: 'base' });
+        });
+
+        var currentLetter = '';
+        records.forEach(function (record) {
+          var letter = firstLetter(record);
+
+          if (letter !== currentLetter) {
+            currentLetter = letter;
+
+            var heading = document.createElement('div');
+            heading.className = 'letter-group';
+            heading.textContent = letter;
+            box.appendChild(heading);
+
+            var jumpButton = document.createElement('button');
+            jumpButton.type = 'button';
+            jumpButton.textContent = letter;
+            jumpButton.addEventListener('click', function () {
+              heading.scrollIntoView({ block: 'start' });
+            });
+            jump.appendChild(jumpButton);
+          }
+
+          addRecordItem(record, record['篇名']);
+        });
+
+        jump.hidden = false;
+        return;
+      }
+
+      // 依閱讀篇章：書名、篇名都依第一次記錄的先後排列
+      records.sort(function (a, b) {
+        return a['新增時間'].localeCompare(b['新增時間']);
+      });
+
+      var books = [];
+      records.forEach(function (record) {
+        var bookGroup = books.filter(function (item) {
+          return item.name === record['書名'];
+        })[0];
+        if (!bookGroup) {
+          bookGroup = { name: record['書名'], articles: [] };
+          books.push(bookGroup);
+        }
+
+        var articleGroup = bookGroup.articles.filter(function (item) {
+          return item.name === record['篇名'];
+        })[0];
+        if (!articleGroup) {
+          articleGroup = { name: record['篇名'], records: [] };
+          bookGroup.articles.push(articleGroup);
+        }
+
+        articleGroup.records.push(record);
+      });
+
+      books.forEach(function (bookGroup) {
+        var bookHeading = document.createElement('div');
+        bookHeading.className = 'book-group';
+        bookHeading.textContent = bookGroup.name;
+        box.appendChild(bookHeading);
+
+        bookGroup.articles.forEach(function (articleGroup) {
+          var articleKey = JSON.stringify([bookGroup.name, articleGroup.name]);
+          var isClosed = Boolean(closedArticles[articleKey]) && !keyword;
+
+          var toggle = document.createElement('button');
+          toggle.type = 'button';
+          toggle.className = 'article-toggle';
+          toggle.setAttribute('aria-expanded', String(!isClosed));
+
+          var articleName = document.createElement('span');
+          articleName.textContent = articleGroup.name;
+          var articleCount = document.createElement('span');
+          articleCount.className = 'article-count';
+          articleCount.textContent = articleGroup.records.length + ' 筆　' + (isClosed ? '展開' : '收合');
+          toggle.appendChild(articleName);
+          toggle.appendChild(articleCount);
+
+          toggle.addEventListener('click', function () {
+            closedArticles[articleKey] = !closedArticles[articleKey];
+            renderRecords();
+          });
+
+          box.appendChild(toggle);
+
+          if (!isClosed) {
+            articleGroup.records.forEach(function (record) {
+              addRecordItem(record, record['類型']);
+            });
+          }
+        });
+      });
+    }
+
+    function showBlock(block, textElement, text) {
+      textElement.textContent = text || '';
+      block.hidden = !text;
+    }
+
+    function showDetail(record, isNewSelection) {
+      var isReading = record['類型'] === '閱讀理解';
+      var sourceText = record['書名'] + '／' + record['篇名'];
+
+      selectedRecordId = record['ID'];
+
+      page['detail-empty'].hidden = true;
+      page['detail-body'].hidden = false;
+      page['detail-title'].textContent = recordName(record);
+      page['detail-phonetic'].textContent = record['音標'] || '';
+      page['detail-short'].textContent = record['簡短釋義'] || '';
+
+      if (!isReading) {
+        var recordSource = record['來源'] === '需手動補充' ? '查無結果' : (record['來源'] || '手動');
+        sourceText = sourceText + '　來源：' + recordSource;
+      }
+      page['detail-source'].textContent = sourceText;
+
+      showMeanings(page['detail-meanings'], isReading ? '' : record['解釋'], isReading ? '' : record['例句']);
+      showBlock(page['detail-sentence-block'], page['detail-sentence'], record['原文句子']);
+      showBlock(page['detail-ai-block'], page['detail-ai'], record['AI解析'] || record['這篇文章中的意思']);
+      showBlock(page['detail-understanding-block'], page['detail-understanding'], record['我的理解']);
+      showBlock(page['detail-question-block'], page['detail-question'], record['疑問']);
+
+      page['detail-note-field'].hidden = isReading;
+      page['detail-note'].value = record['我的註解'] || '';
+      showStatus(page['detail-status'], '', false);
+
+      renderRecords();
+
+      if (isNewSelection && window.matchMedia('(max-width: 860px)').matches) {
+        listScroll = window.scrollY;
+        document.querySelector('.records-layout').className = 'records-layout showing-detail';
+        window.scrollTo(0, 0);
+      }
+    }
+
+    page['back-to-list'].addEventListener('click', function () {
+      document.querySelector('.records-layout').className = 'records-layout';
+      window.scrollTo(0, listScroll);
+    });
+
+    page['record-search'].addEventListener('input', renderRecords);
+    page['book-filter'].addEventListener('change', renderRecords);
+
+    document.querySelectorAll('[data-sort]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        sortMode = button.dataset.sort;
+
+        document.querySelectorAll('[data-sort]').forEach(function (other) {
+          other.setAttribute('aria-pressed', String(other === button));
+        });
+
+        if (sortMode === '字母' && typeFilter === '閱讀理解') {
+          typeFilter = '全部';
+          document.querySelectorAll('[data-filter-type]').forEach(function (other) {
+            other.setAttribute('aria-pressed', String(other.dataset.filterType === '全部'));
+          });
+        }
+
+        renderRecords();
+      });
+    });
+
+    document.querySelectorAll('[data-filter-type]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        typeFilter = button.dataset.filterType;
+
+        document.querySelectorAll('[data-filter-type]').forEach(function (other) {
+          other.setAttribute('aria-pressed', String(other === button));
+        });
+
+        renderRecords();
+      });
+    });
+
+    // 紀錄頁的我的註解：離開欄位時自動儲存
+    page['detail-note'].addEventListener('change', function () {
+      var id = selectedRecordId;
+      var note = page['detail-note'].value;
+      var record = findLoadedRecord(id);
+
+      if (!record) {
+        return;
+      }
+
+      showStatus(page['detail-status'], '儲存中…', false);
+
+      google.script.run
+        .withSuccessHandler(function () {
+          record['我的註解'] = note;
+          if (selectedRecordId === id) {
+            showStatus(page['detail-status'], '已儲存註解', false);
+          }
+        })
+        .withFailureHandler(function (error) {
+          showStatus(page['detail-status'], errorText(error, '註解沒有存成功，請確認網路後再改一次。'), true);
+        })
+        .saveNote({ id: id, note: note });
+    });
+
+    // 載入上次鎖定的書名與篇名
+    google.script.run
+      .withSuccessHandler(function (data) {
+        articlesByBook = data.articlesByBook || {};
+        aiReady = data.aiReady;
+        currentBook = data.lastBook || '';
+        currentArticle = data.lastArticle || '';
+
+        showUsage(data.aiUsage);
+        refreshOptions();
+
+        if (currentBook && currentArticle) {
+          showWorkspace();
+        } else {
+          showSetup();
+        }
+      })
+      .withFailureHandler(function () {
+        showSetup();
+        showStatus(page['setup-status'], '上次的書名和篇名載入失敗，請手動輸入。', true);
+      })
+      .getInitialData();
+  </script>
+</body>
+</html>
